@@ -37,7 +37,8 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const { pathname } = request.nextUrl;
 
-      const isPublic = pathname === "/login" || pathname.startsWith("/api/auth");
+      const isPublic =
+        pathname === "/login" || pathname.startsWith("/api/auth") || pathname === "/api/health";
       if (isPublic) return true;
 
       if (!isLoggedIn) return false;
