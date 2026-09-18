@@ -2,11 +2,8 @@
 // Doku: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client"
-  output        = "../src/generated/prisma"
-  // "native" für lokale Entwicklung, "rhel-openssl-3.0.x" für Netlifys
-  // AWS-Lambda-basierte Functions (sonst fehlt dort die Query-Engine).
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
