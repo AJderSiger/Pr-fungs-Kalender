@@ -8,6 +8,10 @@ import type { NextAuthConfig } from "next-auth";
  * Components) verwendet.
  */
 export const authConfig = {
+  // Netlify (und andere Hosts ausser Vercel) werden von Auth.js nicht
+  // automatisch als vertrauenswürdig erkannt – ohne dies schlägt jede
+  // Anfrage mit "There is a problem with the server configuration" fehl.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
