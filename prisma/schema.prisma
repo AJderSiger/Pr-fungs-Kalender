@@ -1,0 +1,53 @@
+// Prisma Schema – Prüfungsplaner
+// Doku: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  displayName  String
+  role         Role
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  exams Exam[] @relation("TeacherExams")
+
+  @@map("users")
+}
+
+model Exam {
+  id           String   @id @default(cuid())
+  subject      String
+  subjectCode  String
+  date         DateTime @db.Date
+  lessonStart  Int
+  lessonEnd    Int
+  title        String
+  description  String?
+  examType     String?
+  room         String?
+  notes        String?
+  teacherId    String
+  teacher      User     @relation("TeacherExams", fields: [teacherId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([date])
+  @@index([teacherId])
+  @@map("exams")
+}
