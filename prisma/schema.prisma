@@ -4,6 +4,12 @@
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
+  // Mit engineType "client" übersetzt Prisma Abfragen selbst und braucht
+  // keine plattformabhängige Query-Engine-Datei mehr (setzt einen Driver
+  // Adapter voraus – siehe src/lib/prisma.ts). Ohne das schlägt der Betrieb
+  // auf Netlify fehl, weil dort auf Debian gebaut und auf RHEL ausgeführt
+  // wird und die erzeugte Datei deshalb nicht passt.
+  engineType = "client"
 }
 
 datasource db {
