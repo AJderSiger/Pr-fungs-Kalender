@@ -1,7 +1,3 @@
-[build]
-  command = "npm run build"
-  publish = ".next"
-
 [build.environment]
   # AUTH_SECRET landet im internen Turbopack-Build-Cache (nicht in der
   # ausgelieferten App). Netlifys Secrets-Scanner würde den Build sonst
