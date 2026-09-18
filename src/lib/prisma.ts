@@ -1,27 +1,27 @@
 import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import { neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL ?? "";
+  const connectionString = process.env.DATABASE_URL;
 
-  // Neon-Datenbanken (Produktion) laufen über den serverlosen HTTP/WebSocket-
-  // Treiber statt über die native Query-Engine-Binärdatei. Das vermeidet
-  // Probleme mit fehlenden Plattform-Binaries in Serverless-Umgebungen wie
-  // Netlify Functions. Lokale Entwicklung (eigener Postgres-Server) nutzt
-  // weiterhin den normalen Client.
-  if (connectionString.includes("neon.tech")) {
-    neonConfig.webSocketConstructor = ws;
-    const adapter = new PrismaNeon({ connectionString });
-    return new PrismaClient({ adapter });
+  // Fehlt die Variable, soll das sofort und deutlich scheitern. Sonst würde
+  // Prisma erst tief im Request-Handling abbrechen und der Fehler käme im
+  // Frontend als irreführendes "Anmeldung fehlgeschlagen" an.
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL ist nicht gesetzt. In der Hosting-Umgebung muss die Variable auch zur Laufzeit (Functions/Runtime) verfügbar sein.",
+    );
   }
 
-  return new PrismaClient();
+  // Der node-postgres-Adapter spricht jeden PostgreSQL-Server (lokal wie Neon)
+  // über eine normale Verbindung an, statt über die plattformabhängige
+  // Query-Engine-Binärdatei. Dadurch gibt es genau einen Codepfad – lokal
+  // getestetes Verhalten entspricht dem in der Produktion.
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

@@ -30,7 +30,14 @@ export function LoginForm() {
       });
 
       if (!result || result.error) {
-        setError("Benutzername oder Passwort ist falsch.");
+        // Auth.js meldet falsche Zugangsdaten als "CredentialsSignin". Alles
+        // andere ist ein Serverproblem und darf nicht als Passwortfehler
+        // angezeigt werden – das verschleiert sonst die eigentliche Ursache.
+        setError(
+          result?.error === "CredentialsSignin"
+            ? "Benutzername oder Passwort ist falsch."
+            : `Serverfehler bei der Anmeldung (${result?.error ?? "unbekannt"}). Bitte die Lehrperson informieren.`,
+        );
         setLoading(false);
         return;
       }
