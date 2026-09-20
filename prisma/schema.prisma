@@ -50,6 +50,7 @@ model Exam {
   // mehrere Lehrpersonen sich einen Login teilen). Wird beim Erstellen aus
   // src/lib/config/teachers.ts vorgeschlagen und kann überschrieben werden.
   teacherName     String
+  room            String   @default("403")
   notes           String?
   teacherId       String
   teacher         User     @relation("TeacherExams", fields: [teacherId], references: [id], onDelete: Cascade)

@@ -34,6 +34,7 @@ function parseFormData(formData: FormData) {
     description: String(formData.get("description") ?? ""),
     examType: String(formData.get("examType") ?? ""),
     teacherName: String(formData.get("teacherName") ?? ""),
+    room: String(formData.get("room") ?? ""),
     notes: String(formData.get("notes") ?? ""),
   };
 
@@ -77,6 +78,7 @@ export async function createExam(_prevState: ActionResult | null, formData: Form
       description: parsed.data.description || null,
       examType: parsed.data.examType || null,
       teacherName: parsed.data.teacherName,
+      room: parsed.data.room,
       notes: parsed.data.notes || null,
       teacherId: teacher.id,
     },
@@ -123,6 +125,7 @@ export async function updateExam(
       description: parsed.data.description || null,
       examType: parsed.data.examType || null,
       teacherName: parsed.data.teacherName,
+      room: parsed.data.room,
       notes: parsed.data.notes || null,
     },
   });

@@ -30,6 +30,7 @@ export const examFormSchema = z.object({
     .trim()
     .min(2, "Name der Lehrperson muss mindestens 2 Zeichen lang sein.")
     .max(80, "Name der Lehrperson ist zu lang."),
+  room: z.string().trim().min(1, "Bitte einen Raum angeben.").max(40, "Raum ist zu lang."),
   notes: z.string().trim().max(1000, "Hinweise sind zu lang.").optional().or(z.literal("")),
 });
 

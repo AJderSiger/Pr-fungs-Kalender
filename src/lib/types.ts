@@ -8,9 +8,10 @@ export type ExamDTO = {
   title: string;
   description: string | null;
   examType: string | null;
+  teacherName: string;
+  room: string;
   notes: string | null;
   teacherId: string;
-  teacherName: string;
 };
 
 type PrismaExamWithTeacher = {
@@ -23,9 +24,10 @@ type PrismaExamWithTeacher = {
   title: string;
   description: string | null;
   examType: string | null;
+  teacherName: string;
+  room: string;
   notes: string | null;
   teacherId: string;
-  teacherName: string;
 };
 
 export function toExamDTO(exam: PrismaExamWithTeacher): ExamDTO {
@@ -39,8 +41,9 @@ export function toExamDTO(exam: PrismaExamWithTeacher): ExamDTO {
     title: exam.title,
     description: exam.description,
     examType: exam.examType,
+    teacherName: exam.teacherName,
+    room: exam.room,
     notes: exam.notes,
     teacherId: exam.teacherId,
-    teacherName: exam.teacherName,
   };
 }

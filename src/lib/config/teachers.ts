@@ -24,3 +24,6 @@ export const MORNING_PRIORITY_SUBJECTS = ["FRW", "W&R"];
 export function getDefaultTeacherForSubject(subjectCode: string): string {
   return DEFAULT_TEACHER_BY_SUBJECT[subjectCode] ?? "";
 }
+
+/** Standard-Raum, da die Klasse die meisten Prüfungen im selben Zimmer schreibt. */
+export const DEFAULT_ROOM = "403";

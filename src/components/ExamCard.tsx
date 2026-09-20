@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Clock, BookOpen, User, Info, Pencil } from "lucide-react";
+import { CalendarDays, Clock, BookOpen, User, MapPin, Info, Pencil } from "lucide-react";
 import type { ExamDTO } from "@/lib/types";
 import { formatExamDate, formatExamTime, parseISODateLocal } from "@/lib/format";
 import { DeleteExamButton } from "@/components/DeleteExamButton";
@@ -45,6 +45,10 @@ export function ExamCard({ exam, canManage = false, compact = false }: ExamCardP
         <p className="flex items-center gap-2">
           <User size={15} className="shrink-0 text-muted" />
           Lehrer: {exam.teacherName}
+        </p>
+        <p className="flex items-center gap-2">
+          <MapPin size={15} className="shrink-0 text-muted" />
+          Raum: {exam.room}
         </p>
         {!compact && exam.notes && (
           <p className="flex items-start gap-2 text-muted">

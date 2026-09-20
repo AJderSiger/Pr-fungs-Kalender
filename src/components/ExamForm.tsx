@@ -6,7 +6,7 @@ import { Loader2, Save, AlertTriangle } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { SUBJECTS, EXAM_TYPES } from "@/lib/config/subjects";
 import { LESSONS, DURATION_OPTIONS_MINUTES } from "@/lib/config/lessons";
-import { getDefaultTeacherForSubject, MORNING_PRIORITY_SUBJECTS } from "@/lib/config/teachers";
+import { getDefaultTeacherForSubject, MORNING_PRIORITY_SUBJECTS, DEFAULT_ROOM } from "@/lib/config/teachers";
 import type { ActionResult } from "@/lib/actions/exams";
 import type { ExamDTO } from "@/lib/types";
 
@@ -228,6 +228,23 @@ export function ExamForm({
         </div>
 
         <div>
+          <label htmlFor="room" className="mb-1 block text-sm font-medium text-foreground">
+            Raum *
+          </label>
+          <input
+            id="room"
+            name="room"
+            type="text"
+            required
+            maxLength={40}
+            placeholder="z. B. 403"
+            defaultValue={initialValues?.room ?? DEFAULT_ROOM}
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
+          />
+          <FieldError message={fieldErrors?.room} />
+        </div>
+
+        <div className="sm:col-span-2">
           <label htmlFor="teacherName" className="mb-1 block text-sm font-medium text-foreground">
             Lehrperson *
           </label>
