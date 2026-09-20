@@ -39,3 +39,38 @@ export function formatLessonRange(startNumber: number, endNumber: number): strin
   if (startNumber === endNumber) return `${start.start} – ${start.end}`;
   return `${start.start} – ${end.end}`;
 }
+
+/** Minuten seit Mitternacht für "HH:mm". */
+export function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+export function minutesToTime(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60) % 24;
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+/** Endzeit ("HH:mm") einer Prüfung, die in der angegebenen Lektion beginnt und so lange dauert. */
+export function getExamEndTime(lessonStart: number, durationMinutes: number): string {
+  const start = getLesson(lessonStart);
+  if (!start) return "";
+  return minutesToTime(timeToMinutes(start.start) + durationMinutes);
+}
+
+/** Anzeige-Zeitraum ("HH:mm – HH:mm") einer Prüfung. */
+export function formatExamTimeRange(lessonStart: number, durationMinutes: number): string {
+  const start = getLesson(lessonStart);
+  if (!start) return "";
+  return `${start.start} – ${getExamEndTime(lessonStart, durationMinutes)}`;
+}
+
+/**
+ * Wochentage (0 = Montag … 4 = Freitag), an denen die Klasse gemäss
+ * Stundenplan tatsächlich Unterricht hat. Wird verwendet, um unterrichtsfreie
+ * Tage im Wochenkalender dezent abzudunkeln. Bei Bedarf anpassen.
+ */
+export const SCHOOL_DAY_INDICES = [3, 4]; // Donnerstag, Freitag
+
+export const DURATION_OPTIONS_MINUTES = [45, 60, 90, 105, 135, 180] as const;

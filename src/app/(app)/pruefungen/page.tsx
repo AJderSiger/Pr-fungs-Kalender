@@ -1,6 +1,6 @@
 import { ListChecks } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getAllExams, getAllTeachers } from "@/lib/data/exams";
+import { getAllExams, getAllTeacherNames } from "@/lib/data/exams";
 import { toExamDTO } from "@/lib/types";
 import { ExamExplorer } from "@/components/ExamExplorer";
 
@@ -8,7 +8,7 @@ export default async function PruefungenPage() {
   const session = await auth();
   const isTeacher = session!.user.role === "TEACHER";
 
-  const [exams, teachers] = await Promise.all([getAllExams(), getAllTeachers()]);
+  const exams = await getAllExams();
 
   return (
     <div className="space-y-6">
@@ -16,7 +16,7 @@ export default async function PruefungenPage() {
         <ListChecks size={22} className="text-primary" />
         Prüfungen
       </h1>
-      <ExamExplorer exams={exams.map(toExamDTO)} teachers={teachers} canManage={isTeacher} />
+      <ExamExplorer exams={exams.map(toExamDTO)} teachers={getAllTeacherNames()} canManage={isTeacher} />
     </div>
   );
 }

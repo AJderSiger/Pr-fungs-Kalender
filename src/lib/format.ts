@@ -1,4 +1,4 @@
-import { formatLessonRange } from "@/lib/config/lessons";
+import { formatExamTimeRange } from "@/lib/config/lessons";
 
 /** Parst ein "yyyy-MM-dd"-Datum als lokales Datum (ohne Zeitzonen-Verschiebung). */
 export function parseISODateLocal(isoDate: string): Date {
@@ -26,6 +26,6 @@ export function formatExamDateShort(date: Date): string {
   return shortDateFormatter.format(date);
 }
 
-export function formatExamTime(lessonStart: number, lessonEnd: number): string {
-  return formatLessonRange(lessonStart, lessonEnd);
+export function formatExamTime(lessonStart: number, durationMinutes: number): string {
+  return formatExamTimeRange(lessonStart, durationMinutes);
 }

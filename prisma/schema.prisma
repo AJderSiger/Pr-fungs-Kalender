@@ -37,21 +37,24 @@ model User {
 }
 
 model Exam {
-  id           String   @id @default(cuid())
-  subject      String
-  subjectCode  String
-  date         DateTime @db.Date
-  lessonStart  Int
-  lessonEnd    Int
-  title        String
-  description  String?
-  examType     String?
-  room         String?
-  notes        String?
-  teacherId    String
-  teacher      User     @relation("TeacherExams", fields: [teacherId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(cuid())
+  subject         String
+  subjectCode     String
+  date            DateTime @db.Date
+  lessonStart     Int
+  durationMinutes Int      @default(45)
+  title           String
+  description     String?
+  examType        String?
+  // Name der Fachlehrperson (unabhängig vom eingeloggten Account, da
+  // mehrere Lehrpersonen sich einen Login teilen). Wird beim Erstellen aus
+  // src/lib/config/teachers.ts vorgeschlagen und kann überschrieben werden.
+  teacherName     String
+  notes           String?
+  teacherId       String
+  teacher         User     @relation("TeacherExams", fields: [teacherId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([date])
   @@index([teacherId])

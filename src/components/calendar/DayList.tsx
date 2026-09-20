@@ -1,7 +1,7 @@
 "use client";
 
 import type { ExamDTO } from "@/lib/types";
-import { LESSONS } from "@/lib/config/lessons";
+import { LESSONS, timeToMinutes, getExamEndTime } from "@/lib/config/lessons";
 import { toIsoDateString } from "@/lib/week";
 import { ExamChip } from "@/components/calendar/ExamChip";
 
@@ -20,7 +20,13 @@ export function DayList({
   return (
     <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
       {LESSONS.map((lesson) => {
-        const lessonExams = dayExams.filter((e) => lesson.number >= e.lessonStart && lesson.number <= e.lessonEnd);
+        const lessonStartMin = timeToMinutes(lesson.start);
+        const lessonEndMin = timeToMinutes(lesson.end);
+        const lessonExams = dayExams.filter((exam) => {
+          const examStartMin = timeToMinutes(LESSONS.find((l) => l.number === exam.lessonStart)?.start ?? "00:00");
+          const examEndMin = timeToMinutes(getExamEndTime(exam.lessonStart, exam.durationMinutes));
+          return examStartMin < lessonEndMin && examEndMin > lessonStartMin;
+        });
         return (
           <div key={lesson.number} className="flex gap-4 px-4 py-3">
             <div className="w-16 shrink-0 text-xs text-muted">

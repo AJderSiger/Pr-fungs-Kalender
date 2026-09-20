@@ -8,19 +8,17 @@ import { ExamCard } from "@/components/ExamCard";
 import { EmptyState } from "@/components/EmptyState";
 import { isDateInIsoWeek } from "@/lib/week";
 
-type Teacher = { id: string; displayName: string };
-
 export function ExamExplorer({
   exams,
   teachers,
   canManage,
 }: {
   exams: ExamDTO[];
-  teachers: Teacher[];
+  teachers: string[];
   canManage: boolean;
 }) {
   const [subjectCode, setSubjectCode] = useState("");
-  const [teacherId, setTeacherId] = useState("");
+  const [teacherName, setTeacherName] = useState("");
   const [date, setDate] = useState("");
   const [week, setWeek] = useState("");
   const [upcomingOnly, setUpcomingOnly] = useState(false);
@@ -30,19 +28,19 @@ export function ExamExplorer({
   const filtered = useMemo(() => {
     return exams.filter((exam) => {
       if (subjectCode && exam.subjectCode !== subjectCode) return false;
-      if (teacherId && exam.teacherId !== teacherId) return false;
+      if (teacherName && exam.teacherName !== teacherName) return false;
       if (date && exam.date !== date) return false;
       if (week && !isDateInIsoWeek(exam.date, week)) return false;
       if (upcomingOnly && exam.date < todayIso) return false;
       return true;
     });
-  }, [exams, subjectCode, teacherId, date, week, upcomingOnly, todayIso]);
+  }, [exams, subjectCode, teacherName, date, week, upcomingOnly, todayIso]);
 
-  const hasActiveFilters = subjectCode || teacherId || date || week || upcomingOnly;
+  const hasActiveFilters = subjectCode || teacherName || date || week || upcomingOnly;
 
   function resetFilters() {
     setSubjectCode("");
-    setTeacherId("");
+    setTeacherName("");
     setDate("");
     setWeek("");
     setUpcomingOnly(false);
@@ -88,14 +86,14 @@ export function ExamExplorer({
           <label className="flex flex-col gap-1 text-xs font-medium text-muted">
             Lehrer
             <select
-              value={teacherId}
-              onChange={(e) => setTeacherId(e.target.value)}
+              value={teacherName}
+              onChange={(e) => setTeacherName(e.target.value)}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
             >
               <option value="">Alle Lehrpersonen</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.displayName}
+              {teachers.map((name) => (
+                <option key={name} value={name}>
+                  {name}
                 </option>
               ))}
             </select>

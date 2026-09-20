@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Save, AlertTriangle } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { SUBJECTS, EXAM_TYPES } from "@/lib/config/subjects";
-import { LESSONS } from "@/lib/config/lessons";
+import { LESSONS, DURATION_OPTIONS_MINUTES } from "@/lib/config/lessons";
+import { getDefaultTeacherForSubject, MORNING_PRIORITY_SUBJECTS } from "@/lib/config/teachers";
 import type { ActionResult } from "@/lib/actions/exams";
 import type { ExamDTO } from "@/lib/types";
 
@@ -30,6 +31,12 @@ function FieldError({ message }: { message?: string }) {
   return <p className="mt-1 text-xs text-danger">{message}</p>;
 }
 
+function formatDurationLabel(minutes: number): string {
+  if (minutes < 60) return `${minutes} Minuten`;
+  if (minutes % 60 === 0) return `${minutes} Minuten (${minutes / 60} Std.)`;
+  return `${minutes} Minuten (${Math.floor(minutes / 60)} Std. ${minutes % 60} Min.)`;
+}
+
 export function ExamForm({
   action,
   initialValues,
@@ -44,6 +51,12 @@ export function ExamForm({
   const router = useRouter();
   const [state, formAction] = useActionState<ActionResult | null, FormData>(action, null);
 
+  const [subjectCode, setSubjectCode] = useState(initialValues?.subjectCode ?? "");
+  const [lessonStart, setLessonStart] = useState(initialValues?.lessonStart?.toString() ?? "");
+  const [teacherName, setTeacherName] = useState(initialValues?.teacherName ?? "");
+  const [lessonTouched, setLessonTouched] = useState(Boolean(initialValues?.lessonStart));
+  const [teacherTouched, setTeacherTouched] = useState(Boolean(initialValues?.teacherName));
+
   useEffect(() => {
     if (state?.success) {
       router.push(successRedirect);
@@ -52,6 +65,16 @@ export function ExamForm({
   }, [state, router, successRedirect]);
 
   const fieldErrors = state && !state.success ? state.fieldErrors : undefined;
+
+  function handleSubjectChange(code: string) {
+    setSubjectCode(code);
+    if (!teacherTouched) {
+      setTeacherName(getDefaultTeacherForSubject(code));
+    }
+    if (!lessonTouched && MORNING_PRIORITY_SUBJECTS.includes(code)) {
+      setLessonStart("1");
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-5 animate-fade-in">
@@ -70,7 +93,8 @@ export function ExamForm({
           <select
             id="subjectCode"
             name="subjectCode"
-            defaultValue={initialValues?.subjectCode ?? ""}
+            value={subjectCode}
+            onChange={(e) => handleSubjectChange(e.target.value)}
             required
             className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
           >
@@ -109,7 +133,11 @@ export function ExamForm({
             id="lessonStart"
             name="lessonStart"
             required
-            defaultValue={initialValues?.lessonStart ?? ""}
+            value={lessonStart}
+            onChange={(e) => {
+              setLessonStart(e.target.value);
+              setLessonTouched(true);
+            }}
             className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
           >
             <option value="" disabled>
@@ -125,26 +153,23 @@ export function ExamForm({
         </div>
 
         <div>
-          <label htmlFor="lessonEnd" className="mb-1 block text-sm font-medium text-foreground">
-            End-Lektion *
+          <label htmlFor="durationMinutes" className="mb-1 block text-sm font-medium text-foreground">
+            Prüfungsdauer *
           </label>
           <select
-            id="lessonEnd"
-            name="lessonEnd"
+            id="durationMinutes"
+            name="durationMinutes"
             required
-            defaultValue={initialValues?.lessonEnd ?? ""}
+            defaultValue={initialValues?.durationMinutes ?? 45}
             className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
           >
-            <option value="" disabled>
-              Bitte wählen …
-            </option>
-            {LESSONS.map((l) => (
-              <option key={l.number} value={l.number}>
-                {l.number}. Lektion ({l.start} – {l.end})
+            {DURATION_OPTIONS_MINUTES.map((minutes) => (
+              <option key={minutes} value={minutes}>
+                {formatDurationLabel(minutes)}
               </option>
             ))}
           </select>
-          <FieldError message={fieldErrors?.lessonEnd} />
+          <FieldError message={fieldErrors?.durationMinutes} />
         </div>
       </div>
 
@@ -203,19 +228,24 @@ export function ExamForm({
         </div>
 
         <div>
-          <label htmlFor="room" className="mb-1 block text-sm font-medium text-foreground">
-            Raum
+          <label htmlFor="teacherName" className="mb-1 block text-sm font-medium text-foreground">
+            Lehrperson *
           </label>
           <input
-            id="room"
-            name="room"
+            id="teacherName"
+            name="teacherName"
             type="text"
-            maxLength={40}
-            placeholder="z. B. B204"
-            defaultValue={initialValues?.room ?? ""}
+            required
+            maxLength={80}
+            placeholder="z. B. Susanne Stolle"
+            value={teacherName}
+            onChange={(e) => {
+              setTeacherName(e.target.value);
+              setTeacherTouched(true);
+            }}
             className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
           />
-          <FieldError message={fieldErrors?.room} />
+          <FieldError message={fieldErrors?.teacherName} />
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Clock, BookOpen, User, MapPin, Info, Pencil } from "lucide-react";
+import { CalendarDays, Clock, BookOpen, User, Info, Pencil } from "lucide-react";
 import type { ExamDTO } from "@/lib/types";
 import { formatExamDate, formatExamTime, parseISODateLocal } from "@/lib/format";
 import { DeleteExamButton } from "@/components/DeleteExamButton";
@@ -36,11 +36,7 @@ export function ExamCard({ exam, canManage = false, compact = false }: ExamCardP
         </p>
         <p className="flex items-center gap-2">
           <Clock size={15} className="shrink-0 text-muted" />
-          {formatExamTime(exam.lessonStart, exam.lessonEnd)} Uhr
-          <span className="text-xs text-muted">
-            (Lektion {exam.lessonStart}
-            {exam.lessonEnd !== exam.lessonStart ? `–${exam.lessonEnd}` : ""})
-          </span>
+          {formatExamTime(exam.lessonStart, exam.durationMinutes)} Uhr
         </p>
         <p className="flex items-center gap-2">
           <BookOpen size={15} className="shrink-0 text-muted" />
@@ -50,12 +46,6 @@ export function ExamCard({ exam, canManage = false, compact = false }: ExamCardP
           <User size={15} className="shrink-0 text-muted" />
           Lehrer: {exam.teacherName}
         </p>
-        {exam.room && (
-          <p className="flex items-center gap-2">
-            <MapPin size={15} className="shrink-0 text-muted" />
-            Raum: {exam.room}
-          </p>
-        )}
         {!compact && exam.notes && (
           <p className="flex items-start gap-2 text-muted">
             <Info size={15} className="mt-0.5 shrink-0" />

@@ -1,13 +1,11 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_TEACHER_BY_SUBJECT } from "@/lib/config/teachers";
 
 export type ExamWithTeacher = Awaited<ReturnType<typeof getAllExams>>[number];
 
 export async function getAllExams() {
   return prisma.exam.findMany({
-    include: {
-      teacher: { select: { id: true, displayName: true, username: true } },
-    },
     orderBy: [{ date: "asc" }, { lessonStart: "asc" }],
   });
 }
@@ -18,27 +16,18 @@ export async function getUpcomingExams(limit = 5) {
 
   return prisma.exam.findMany({
     where: { date: { gte: today } },
-    include: {
-      teacher: { select: { id: true, displayName: true, username: true } },
-    },
     orderBy: [{ date: "asc" }, { lessonStart: "asc" }],
     take: limit,
   });
 }
 
 export async function getExamById(id: string) {
-  return prisma.exam.findUnique({
-    where: { id },
-    include: {
-      teacher: { select: { id: true, displayName: true, username: true } },
-    },
-  });
+  return prisma.exam.findUnique({ where: { id } });
 }
 
-export async function getAllTeachers() {
-  return prisma.user.findMany({
-    where: { role: "TEACHER" },
-    select: { id: true, displayName: true, username: true },
-    orderBy: { displayName: "asc" },
-  });
+/** Alle bekannten Fachlehrpersonen, für das Filter-Dropdown "Lehrer". */
+export function getAllTeacherNames(): string[] {
+  return Array.from(new Set(Object.values(DEFAULT_TEACHER_BY_SUBJECT))).sort((a, b) =>
+    a.localeCompare(b, "de-CH"),
+  );
 }

@@ -4,11 +4,10 @@ export type ExamDTO = {
   subjectCode: string;
   date: string; // ISO date (yyyy-MM-dd)
   lessonStart: number;
-  lessonEnd: number;
+  durationMinutes: number;
   title: string;
   description: string | null;
   examType: string | null;
-  room: string | null;
   notes: string | null;
   teacherId: string;
   teacherName: string;
@@ -20,14 +19,13 @@ type PrismaExamWithTeacher = {
   subjectCode: string;
   date: Date;
   lessonStart: number;
-  lessonEnd: number;
+  durationMinutes: number;
   title: string;
   description: string | null;
   examType: string | null;
-  room: string | null;
   notes: string | null;
   teacherId: string;
-  teacher: { displayName: string };
+  teacherName: string;
 };
 
 export function toExamDTO(exam: PrismaExamWithTeacher): ExamDTO {
@@ -37,13 +35,12 @@ export function toExamDTO(exam: PrismaExamWithTeacher): ExamDTO {
     subjectCode: exam.subjectCode,
     date: exam.date.toISOString().slice(0, 10),
     lessonStart: exam.lessonStart,
-    lessonEnd: exam.lessonEnd,
+    durationMinutes: exam.durationMinutes,
     title: exam.title,
     description: exam.description,
     examType: exam.examType,
-    room: exam.room,
     notes: exam.notes,
     teacherId: exam.teacherId,
-    teacherName: exam.teacher.displayName,
+    teacherName: exam.teacherName,
   };
 }
