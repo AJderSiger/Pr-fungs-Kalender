@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { Loader2, Save, AlertTriangle } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { SUBJECTS, EXAM_TYPES } from "@/lib/config/subjects";
-import { LESSONS, DURATION_OPTIONS_MINUTES } from "@/lib/config/lessons";
-import { getDefaultTeacherForSubject, MORNING_PRIORITY_SUBJECTS, DEFAULT_ROOM } from "@/lib/config/teachers";
+import { LESSONS, DURATION_OPTIONS_MINUTES, SCHOOL_DAY_INDICES } from "@/lib/config/lessons";
+import { getDefaultTeacherForSubject, DEFAULT_ROOM } from "@/lib/config/teachers";
+import { suggestLessonStart } from "@/lib/config/timetable";
+import { getWeekdayIndex, getWeekdayName } from "@/lib/week";
 import type { ActionResult } from "@/lib/actions/exams";
 import type { ExamDTO } from "@/lib/types";
 
@@ -52,6 +54,7 @@ export function ExamForm({
   const [state, formAction] = useActionState<ActionResult | null, FormData>(action, null);
 
   const [subjectCode, setSubjectCode] = useState(initialValues?.subjectCode ?? "");
+  const [date, setDate] = useState(initialValues?.date ?? "");
   const [lessonStart, setLessonStart] = useState(initialValues?.lessonStart?.toString() ?? "");
   const [teacherName, setTeacherName] = useState(initialValues?.teacherName ?? "");
   const [lessonTouched, setLessonTouched] = useState(Boolean(initialValues?.lessonStart));
@@ -66,14 +69,36 @@ export function ExamForm({
 
   const fieldErrors = state && !state.success ? state.fieldErrors : undefined;
 
+  function applyLessonSuggestion(code: string, dateValue: string) {
+    if (lessonTouched || !code) return;
+    const weekday = dateValue ? getWeekdayIndex(dateValue) : null;
+    const suggested = suggestLessonStart(code, weekday);
+    if (suggested !== null) setLessonStart(String(suggested));
+  }
+
   function handleSubjectChange(code: string) {
     setSubjectCode(code);
     if (!teacherTouched) {
       setTeacherName(getDefaultTeacherForSubject(code));
     }
-    if (!lessonTouched && MORNING_PRIORITY_SUBJECTS.includes(code)) {
-      setLessonStart("1");
+    applyLessonSuggestion(code, date);
+  }
+
+  function handleDateChange(value: string) {
+    if (value) {
+      const weekday = getWeekdayIndex(value);
+      if (!SCHOOL_DAY_INDICES.includes(weekday)) {
+        const confirmed = window.confirm(
+          `Am ${getWeekdayName(weekday)} haben wir gemäss Stundenplan keine Schule (nur Donnerstag und Freitag). Trotzdem eine Prüfung an diesem Tag eintragen?`,
+        );
+        if (!confirmed) {
+          setDate("");
+          return;
+        }
+      }
     }
+    setDate(value);
+    applyLessonSuggestion(subjectCode, value);
   }
 
   return (
@@ -119,7 +144,8 @@ export function ExamForm({
             name="date"
             type="date"
             required
-            defaultValue={initialValues?.date ?? ""}
+            value={date}
+            onChange={(e) => handleDateChange(e.target.value)}
             className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
           />
           <FieldError message={fieldErrors?.date} />

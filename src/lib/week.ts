@@ -17,6 +17,17 @@ export function isDateInIsoWeek(isoDate: string, isoWeek: string): boolean {
   return getIsoWeek(isoDate) === isoWeek;
 }
 
+/** Wochentag eines "yyyy-MM-dd"-Datums: 0 = Montag … 6 = Sonntag. */
+export function getWeekdayIndex(isoDate: string): number {
+  return (parseISODateLocal(isoDate).getDay() + 6) % 7;
+}
+
+const WEEKDAY_NAMES = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+
+export function getWeekdayName(weekdayIndex: number): string {
+  return WEEKDAY_NAMES[weekdayIndex] ?? "";
+}
+
 export function startOfWeekMonday(date: Date): Date {
   const result = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const dayNumber = (result.getDay() + 6) % 7; // Montag = 0

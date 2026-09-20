@@ -15,12 +15,6 @@ export const DEFAULT_TEACHER_BY_SUBJECT: Record<string, string> = {
   "W&R": "Juliette Merath",
 };
 
-/**
- * Fächer, deren Prüfungen standardmässig auf die 1. Lektion gelegt werden
- * (gleiche Lehrperson, meist am frühen Morgen unterrichtet).
- */
-export const MORNING_PRIORITY_SUBJECTS = ["FRW", "W&R"];
-
 export function getDefaultTeacherForSubject(subjectCode: string): string {
   return DEFAULT_TEACHER_BY_SUBJECT[subjectCode] ?? "";
 }
